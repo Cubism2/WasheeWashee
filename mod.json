@@ -45,5 +45,8 @@
 			"resources/sprites/mrwasheewashee.png",
 			"resources/sprites/moe.png"
 		]
-	}
+	},
+	"tags": [
+		"joke"
+	]
 }
