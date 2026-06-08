@@ -1,0 +1,49 @@
+{
+	"geode": "5.7.1",
+	"gd": {
+		"win": "2.2081",
+		"android": "2.2081",
+		"mac": "2.2081",
+		"ios": "2.2081"
+	},
+	"id": "cubism_2.washeewashee",
+	"name": "WasheeWashee",
+	"version": "v1.0.0",
+	"developer": "Cubism_2",
+	"description": "Silly joke mod overlays Mr. Washee Washee",
+	"dependencies": {
+		"geode.node-ids": ">=v1.23.3"
+	},
+	"settings": {
+		"enable-washee": {
+			"type": "bool",
+			"name": "Enable WasheeWashee",
+			"description": "Show Mr. Washee Washee over the game",
+			"default": true
+		},
+		"randomize-washee": {
+			"type": "bool",
+			"name": "Randomize WasheeWashee",
+			"description": "Randomize the position, rotation, scale, and opacity of Mr. Washee Washee",
+			"default": false
+		},
+		"enable-moe": {
+			"type": "bool",
+			"name": "Enable Moe",
+			"description": "Show Moe over the game",
+			"default": false
+		},
+		"randomize-moe": {
+			"type": "bool",
+			"name": "Randomize Moe",
+			"description": "Randomize the position, rotation, scale, and opacity of Moe",
+			"default": false
+		}
+	},
+	"resources": {
+		"sprites": [
+			"resources/sprites/mrwasheewashee.png",
+			"resources/sprites/moe.png"
+		]
+	}
+}
