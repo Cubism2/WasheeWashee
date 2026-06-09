@@ -1,101 +1,137 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/CCDirector.hpp>
+#include <Geode/ui/OverlayManager.hpp>
+#include <Geode/utils/random.hpp>
 
 using namespace geode::prelude;
 
-class $modify(GlobalOverlay, CCDirector) {
-    void drawScene() {
-
-        // I know I'm not supposed to call this manually but when I removed it the game wouldn't load
-        CCDirector::drawScene();
-
-        // Get current scene
-        auto currScene = this->getRunningScene();
-        if (!currScene) {
-            return;
-        }
-
-        // All mod settings
-        bool isWasheeEnabled = Mod::get()->getSettingValue<bool>("enable-washee");
-        bool isMoeEnabled = Mod::get()->getSettingValue<bool>("enable-moe");
-        bool isRandomizingWashee = Mod::get()->getSettingValue<bool>("randomize-washee");
-        bool isRandomizingMoe = Mod::get()->getSettingValue<bool>("randomize-moe");
-
-        // Check if Mr. Washee Washee is enabled to show up on screen
-        if (isWasheeEnabled) {
+namespace {
+    
+    // Randomize sprite each time you reenable the setting
+    void setRandom(CCSprite* sprite) {
+        if (!sprite) return;
+        
+        auto winSize = CCDirector::sharedDirector()->getWinSize();
+            sprite->setPosition({random::generate<float>(0.f, winSize.width), random::generate<float>(0, winSize.height)});
+            sprite->setRotation(random::generate<float>(0.f,360.f));
+            sprite->setScale(random::generate<float>(0.1f, 5.0f));
+            sprite->setOpacity(random::generate(1,255));
+    }
+    
+    // Add Mr. Washee Washee node
+    void createWashee(bool value) {
+        if (value) {
+            // Prevent duplicates
+            if (OverlayManager::get()->getChildByID("mrwasheewashee"_spr)) return;
             
-            // Draws Mr. Washee Washee
-            if (!currScene->getChildByID("mrwasheewashee")) {
-                auto winSize = CCDirector::sharedDirector()->getWinSize();
+            // Create sprite
+            auto washee = CCSprite::create("mrwasheewashee.png"_spr);
+            if (!washee) return;
+    
+            auto winSize = CCDirector::sharedDirector()->getWinSize();
 
-                // Get sprite and set up node
-                auto washee = CCSprite::create("mrwasheewashee.png"_spr);
-
-                if (washee) {
-                    washee->setID("mrwasheewashee");
-
-                    // Randomize position, rotation, scale, and opacity if the setting is enabled
-                    if (isRandomizingWashee) {
-                        washee->setPosition({ CCRANDOM_0_1() * winSize.width, CCRANDOM_0_1() * winSize.height });
-                        washee->setRotation(CCRANDOM_0_1() * 360.0f);
-                        washee->setScale(0.5f + CCRANDOM_0_1());
-                        washee->setOpacity(CCRANDOM_0_1() * 255);
-                    } else {
-                        
-                        // Default position
-                        washee->setPosition({ (winSize.width * 3.0f) / 4.0f, winSize.height / 2.0f });
-                    }
-
-                    // Add him to scene. High Z-order to put it above everything else
-                    currScene->addChild(washee, 9999);
-                } else {
-                    log::error("Failed to load sprite");
-                }
+            // Randomzie if setting enabled
+            bool randomize = Mod::get()->getSettingValue<bool>("randomize-washee");
+            if (randomize) {
+                setRandom(washee);
+            } else {
+                // Default position if not enabled
+                washee->setPosition({ (winSize.width * 3.0f) / 4.0f, winSize.height / 2.0f });
             }
+            
+            // Set ID
+            washee->setID("mrwasheewashee"_spr);
+    
+            // Add to screen
+            OverlayManager::get()->addChild(washee);
         } else {
-            auto washee = currScene->getChildByID("mrwasheewashee");
-            
-            // Removes Mr. Washee Washee if setting is disabled and is he's still there
-            if (washee) {
-                washee->removeFromParentAndCleanup(true);
-            }
-        }
-
-        // Adds Moe if enabled. Same logic as Mr. Washee Washee
-        if (isMoeEnabled) {
-            
-            // Draws Moe
-            if (!currScene->getChildByID("moe")) {
-                auto winSize = CCDirector::sharedDirector()->getWinSize();
-
-                // Get sprite and set up node
-                auto moe = CCSprite::create("moe.png"_spr);
-                if (moe) {
-                    moe->setID("moe");
-
-                    // Randomize position, rotation, scale, and opacity if the setting is enabled
-                    if (isRandomizingMoe) {
-                        moe->setPosition({ CCRANDOM_0_1() * winSize.width, CCRANDOM_0_1() * winSize.height });
-                        moe->setRotation(CCRANDOM_0_1() * 360.0f);
-                        moe->setScale(0.5f + CCRANDOM_0_1());
-                        moe->setOpacity(CCRANDOM_0_1() * 255);
-                    } else {
-                        moe->setPosition({ winSize.width / 4.0f, winSize.height / 2.0f });
-                    }
-
-                    // Add Moe to scene. High Z-order to put it above everything else
-                    currScene->addChild(moe, 9999);
-                } else {
-                    log::error("Failed to load sprite");
-                }
-            }
-        } else {
-            auto moe = currScene->getChildByID("moe");
-            if (moe) {
-                
-                // Removes Moe if setting is disabled and he's still there
-                moe->removeFromParentAndCleanup(true);
+            // Get node and remove from screen when setting disabled
+            auto washeeNode = OverlayManager::get()->getChildByID("mrwasheewashee"_spr);
+            if (washeeNode) {
+                washeeNode->removeFromParentAndCleanup(true);
             }
         }
     }
-};
+
+    // Draws Moe on screen. Same logic as Mr. Washee Washee
+    void createMoe(bool value) {
+        if (value) {
+            if (OverlayManager::get()->getChildByID("moe"_spr)) return;
+            
+            auto moe = CCSprite::create("moe.png"_spr);
+            if (!moe) return;
+
+            auto winSize = CCDirector::sharedDirector()->getWinSize();
+            bool randomize = Mod::get()->getSettingValue<bool>("randomize-moe");
+            if (randomize) {
+                setRandom(moe);
+            } else {
+                moe->setPosition({ (winSize.width) / 4.0f, winSize.height / 2.0f });
+            }
+            moe->setID("moe"_spr);
+    
+            OverlayManager::get()->addChild(moe);
+        } else {
+            auto moeNode = OverlayManager::get()->getChildByID("moe"_spr);
+            if (moeNode) {
+                moeNode->removeFromParentAndCleanup(true);
+            }
+        }
+    }
+}
+
+$on_game(Loaded) {
+    // Retain settings from last session
+    createWashee(Mod::get()->getSettingValue<bool>("enable-washee"));
+    createMoe(Mod::get()->getSettingValue<bool>("enable-moe"));
+    
+    // Update Enable Washee setting
+    listenForSettingChanges<bool>("enable-washee", [](bool value) {
+        createWashee(value);
+    });
+
+    // Update Enable Moe setting
+    listenForSettingChanges<bool>("enable-moe", [](bool value) {
+        createMoe(value);
+    });
+
+    // Update Randomize Washee setting
+    listenForSettingChanges<bool>("randomize-washee", [](bool value) {
+        auto washeeNode = OverlayManager::get()->getChildByID("mrwasheewashee"_spr);
+        if (washeeNode) {
+            // Get sprite from node
+            if (auto washee = typeinfo_cast<CCSprite*>(washeeNode)) {
+                if (value) {
+                    // Re randomize position
+                    setRandom(washee);
+                } else {
+                    // Return to default
+                    auto winSize = CCDirector::sharedDirector()->getWinSize();
+                    washee->setPosition({(winSize.width * 3.0f) / 4.0f, winSize.height / 2.0f});
+                    washee->setRotation(0);
+                    washee->setScale(1);
+                    washee->setOpacity(255);
+                }
+            } 
+        }
+    });
+
+    // Update Randomize Moe setting
+    listenForSettingChanges<bool>("randomize-moe", [](bool value) {
+        // Same logic as Randomize Washee
+        auto moeNode = OverlayManager::get()->getChildByID("moe"_spr);
+        if (moeNode) {
+            if (auto moe = typeinfo_cast<CCSprite*>(moeNode)) {
+                if (value) {
+                    setRandom(moe);
+                } else {
+                    auto winSize = CCDirector::sharedDirector()->getWinSize();
+                    moe->setPosition({(winSize.width) / 4.0f, winSize.height / 2.0f});
+                    moe->setRotation(0);
+                    moe->setScale(1);
+                    moe->setOpacity(255);
+                }
+            } 
+        }
+    });
+}
