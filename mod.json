@@ -12,7 +12,7 @@
 	"developer": "Cubism_2",
 	"description": "Silly joke mod overlays Mr. Washee Washee",
 	"dependencies": {
-		"geode.node-ids": ">=v1.23.3"
+		"geode.node-ids": ">=1.23.3"
 	},
 	"settings": {
 		"enable-washee": {
