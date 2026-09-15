@@ -6,3 +6,4 @@ This is a silly joke mod that overlays Mr. Washee Washee from Family Guy over th
 
 * **Enable** or **disable** Mr. Washee Washee and Moe in the mod options
 * **Randomize** the **location, rotation, scale, and opacity** of either character on screen 
+* Enable or disable randomization for your desired characters in settings
