@@ -56,7 +56,8 @@
 		"sprites": [
 			"resources/sprites/mrwasheewashee.png",
 			"resources/sprites/moe.png",
-			"resources/sprites/rogersmith.png"
+			"resources/sprites/rogersmith.png",
+			"resources/sprites/randomize_btn.png"
 		]
 	},
 	"tags": [

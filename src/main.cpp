@@ -122,12 +122,18 @@ class $modify(MyMenuLayer, MenuLayer) {
 			return false;
 		}
 
-        auto randomizeBtn = CCMenuItemSpriteExtra::create(CCSprite::createWithSpriteFrameName("GJ_likeBtn_001.png"), this, menu_selector(MyMenuLayer::onRandomBtn));
+        // Define custom sprite for randomize button, and set scale
+        // (Was too big when I defined it directly in randomizeBtn)
+        auto randomBtnSprite = CCSprite::create("randomize_btn.png"_spr);
+        randomBtnSprite->setScale(0.75f);
+
+        auto randomizeBtn = CCMenuItemSpriteExtra::create(randomBtnSprite, this, menu_selector(MyMenuLayer::onRandomBtn));
 
         auto menu = this->getChildByID("right-side-menu");
 
         randomizeBtn->setID("randomize-characters"_spr);
 
+        // Add button to right side menu
         if (menu) {
 		    menu->addChild(randomizeBtn);
 			menu->updateLayout();
